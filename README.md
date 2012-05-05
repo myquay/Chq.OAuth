@@ -63,7 +63,7 @@ client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 ```c#
 String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
-                  .WithQueryParameter("param", "value") //options
+                  .WithQueryParameter("param", "value")
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest();
                   
