@@ -59,9 +59,15 @@ client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 6: Yay, you're done! Now you can access protected resources.
 
 ```c#
-String response = client.MakeRequest("GET")
+String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
-                  .WithQueryParameter("param", "value")
+                  .WithQueryParameter("param", "value") //options
+                  .Sign(client.AccessToken.Secret)
+                  .ExecuteRequest());
+                  
+String postResponse = await client.MakeRequest("POST")
+                  .WithData(data)
+                  .ForResource(client.AccessToken.Token, protectedResourceUri)
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest());
 ```
