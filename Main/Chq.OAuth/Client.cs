@@ -30,6 +30,11 @@ namespace Chq.OAuth
             return new OAuthRequest(method, Context);
         }
 
+        public Uri GetAuthorizationUri()
+        {
+            return new Uri(Context.AuthorizationUri.ToString() + "?oauth_token=" + RequestToken.Token);
+        }
+
         public void Reset()
         {
             RequestToken = null;
