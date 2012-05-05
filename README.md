@@ -5,6 +5,8 @@ Chq.OAuth
 Chq.OAuth is a simple C# OAuth library for creating OAuth consumers in Windows 8 Metro applications.
 This is an early stage project so things will probably change :)
 
+You can grab the latest version on NuGet: https://nuget.org/packages/Chq.OAuth.dll
+
 # Usage
 1: Create an OAuthContext object, this holds a whole bunch of informaion about the service that you're communicating with.
 
