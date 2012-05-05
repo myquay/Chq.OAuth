@@ -73,3 +73,5 @@ String postResponse = await client.MakeRequest("POST")
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest();
 ```
+
+7: Fork it, have fun, create a wrapper for your favourite web applications
