@@ -51,7 +51,7 @@ String verificationCode = ...
 String accessTokenResponse = await client.MakeRequest("GET")
                     .ForAccessToken(client.RequestToken.Token, verificationCode)
                     .Sign(client.RequestToken.Secret)
-                    .ExecuteRequest());
+                    .ExecuteRequest();
                     
 client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 ```
@@ -63,11 +63,11 @@ String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
                   .WithQueryParameter("param", "value") //options
                   .Sign(client.AccessToken.Secret)
-                  .ExecuteRequest());
+                  .ExecuteRequest();
                   
 String postResponse = await client.MakeRequest("POST")
                   .WithData(data)
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
                   .Sign(client.AccessToken.Secret)
-                  .ExecuteRequest());
+                  .ExecuteRequest();
 ```
