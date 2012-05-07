@@ -5,6 +5,8 @@ Chq.OAuth
 Chq.OAuth is a simple C# OAuth library for creating OAuth consumers in Windows 8 Metro applications.
 This is an early stage project so things will probably change :)
 
+You can grab the latest version on NuGet: https://nuget.org/packages/Chq.OAuth.dll
+
 # Usage
 1: Create an OAuthContext object, this holds a whole bunch of informaion about the service that you're communicating with.
 
@@ -51,7 +53,7 @@ String verificationCode = ...
 String accessTokenResponse = await client.MakeRequest("GET")
                     .ForAccessToken(client.RequestToken.Token, verificationCode)
                     .Sign(client.RequestToken.Secret)
-                    .ExecuteRequest());
+                    .ExecuteRequest();
                     
 client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 ```
@@ -59,9 +61,17 @@ client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 6: Yay, you're done! Now you can access protected resources.
 
 ```c#
-String response = client.MakeRequest("GET")
+String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
                   .WithQueryParameter("param", "value")
                   .Sign(client.AccessToken.Secret)
-                  .ExecuteRequest());
+                  .ExecuteRequest();
+                  
+String postResponse = await client.MakeRequest("POST")
+                  .WithData(data)
+                  .ForResource(client.AccessToken.Token, protectedResourceUri)
+                  .Sign(client.AccessToken.Secret)
+                  .ExecuteRequest();
 ```
+
+7: Fork it, have fun, create a wrapper for your favourite web applications
