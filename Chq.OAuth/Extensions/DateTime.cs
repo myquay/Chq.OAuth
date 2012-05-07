@@ -10,7 +10,7 @@ namespace System
     {
         public static long SinceEpoch(this DateTime time)
         {
-            return (long)(time - new DateTime(1970, 1, 1)).TotalSeconds;
+            return (long)(time - new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds;
         } 
     }
 }

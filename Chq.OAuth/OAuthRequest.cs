@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Chq.OAuth.Credentials;
@@ -32,6 +33,7 @@ namespace Chq.OAuth
         Uri Url { get; set; }
         string Method { get; set; }
         string Data {get;set;}
+        string ContentType {get;set;}
 
         protected OAuthContext _context;
         public OAuthContext Context
@@ -46,7 +48,7 @@ namespace Chq.OAuth
         }
 
         public OAuthRequest ForRequestToken()
-        {
+        {            
             AuthParameters.Clear();
             QueryParameters.Clear();
 
@@ -81,9 +83,38 @@ namespace Chq.OAuth
             return this;
         }
 
+        [Obsolete("Please use WithParameters(...)")]
         public OAuthRequest WithQueryParameter(string name, string value)
         {
+            if (QueryParameters.ContainsKey(name)) QueryParameters.Remove(name);
             QueryParameters.Add(name, value);
+            return this;
+        }
+
+        public OAuthRequest WithParameters(object parameters)
+        {
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters.GetType().GetTypeInfo().DeclaredProperties)
+                {
+                    if (parameter.Name.StartsWith("oauth_"))
+                    {
+                        AuthParameters.Remove(parameter.Name);
+                        AuthParameters.Add(parameter.Name, parameter.GetValue(parameters).ToString());
+                    }
+                    else
+                    {
+                        if (QueryParameters.ContainsKey(parameter.Name)) QueryParameters.Remove(parameter.Name);
+                        QueryParameters.Add(parameter.Name, parameter.GetValue(parameters).ToString());
+                    }
+                }
+            }
+            return this;
+        }
+
+        public OAuthRequest SetContentTypeTo(string contentType)
+        {
+            ContentType = contentType;
             return this;
         }
 
@@ -98,6 +129,7 @@ namespace Chq.OAuth
             AuthParameters.Add(OAuthParameters.TIMESTAMP, DateTime.UtcNow.SinceEpoch().ToString());
             AuthParameters.Add(OAuthParameters.NONCE, Guid.NewGuid().ToString());
             AuthParameters.Add(OAuthParameters.SIGNATURE_METHOD, Context.SignatureMethodText);
+
             Url = protectedResource;
 
             return this;
@@ -148,7 +180,7 @@ namespace Chq.OAuth
                     SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
                 }
 
-                Request = (HttpWebRequest)WebRequest.Create(Url + "?" + SigBaseStringParams);
+                Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "": "?" + SigBaseStringParams));
                 Request.Method = Method.ToUpper();
             }
             else
@@ -157,20 +189,23 @@ namespace Chq.OAuth
 
                 Request = (HttpWebRequest)WebRequest.Create(Url);
                 Request.Method = Method.ToUpper();
-                Request.ContentType = "text/xml";
+                if (!String.IsNullOrEmpty(ContentType)) Request.ContentType = ContentType;
 
-                var stream = await Request.GetRequestStreamAsync();
-                StreamWriter stOut = new StreamWriter(stream, System.Text.Encoding.UTF8);
-                stOut.Write(Data);
-                await stOut.FlushAsync();
-                stOut.Dispose();
+                if (Data != null)
+                {
+                    var stream = await Request.GetRequestStreamAsync();
+                    StreamWriter stOut = new StreamWriter(stream, System.Text.Encoding.UTF8);
+                    stOut.Write(Data);
+                    await stOut.FlushAsync();
+                    stOut.Dispose();
+                }
             }
 
             String authHeader = "OAuth";
             var orderedParameters = AuthParameters.OrderBy(d => d.Key);
             foreach (var item in orderedParameters)
             {
-                authHeader += ", " + item.Key + "=" + OAuthEncoding.Encode(item.Value);
+                authHeader += (item.Key != orderedParameters.First().Key ? ", ":" ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value)+"\"";
             }
 
             Request.Headers["Authorization"] = authHeader;
