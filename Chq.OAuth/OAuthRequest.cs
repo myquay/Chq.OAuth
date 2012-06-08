@@ -52,7 +52,9 @@ namespace Chq.OAuth
             AuthParameters.Clear();
             QueryParameters.Clear();
 
-            AuthParameters.Add(OAuthParameters.CALL_BACK, Context.CallbackUri.ToString());
+            if(Context.CallbackUri != null)
+                AuthParameters.Add(OAuthParameters.CALL_BACK, Context.CallbackUri.ToString());
+            
             AuthParameters.Add(OAuthParameters.CONSUMER_KEY, Context.ConsumerToken.Token);
             AuthParameters.Add(OAuthParameters.VERSION, "1.0");
             AuthParameters.Add(OAuthParameters.TIMESTAMP, DateTime.UtcNow.SinceEpoch().ToString());
