@@ -25,7 +25,7 @@ var client =  new Client(context);
 ```c#
 String requestTokenResponse = await client.MakeRequest("GET")
                     .ForRequestToken()
-                    .WithQueryParameter("scope", "email") //Optional, changes depending on provider
+                    .WithParameters( new { scope = "email"} ) //Optional, changes depending on provider
                     .Sign()
                     .ExecuteRequest();
                     
@@ -63,7 +63,7 @@ client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 ```c#
 String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
-                  .WithQueryParameter("param", "value")
+                  .WithParameters(new { param = "value" })
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest();
                   
