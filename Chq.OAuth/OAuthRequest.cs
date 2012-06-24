@@ -18,6 +18,7 @@ namespace Chq.OAuth
     {
         Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
         Dictionary<string, string> AuthParameters = new Dictionary<string, string>();
+        Dictionary<string, string> FormParameters = new Dictionary<string, string>();
 
         Dictionary<string, string> AllParameters
         {
@@ -26,6 +27,7 @@ namespace Chq.OAuth
                 Dictionary<string, string> AllParameters = new Dictionary<string, string>();
                 foreach (var element in QueryParameters) AllParameters.Add(element.Key, element.Value);
                 foreach (var element in AuthParameters) AllParameters.Add(element.Key, element.Value);
+                foreach (var element in FormParameters) AllParameters.Add(element.Key, element.Value);
                 return AllParameters;
             }
         }
@@ -143,6 +145,34 @@ namespace Chq.OAuth
             return this;
         }
 
+        public OAuthRequest WithFormEncodedData(object data)
+        {
+            StringBuilder builder = new StringBuilder();
+            if (data != null)
+            {
+                foreach (var item in data.GetType().GetTypeInfo().DeclaredProperties)
+                {
+                    if (builder.Length > 0)
+                        builder.Append("&");
+                    var key = item.Name;
+                    builder.Append(key);
+                    object value = item.GetValue(data);
+
+                    if (value != null)
+                    {                        
+                        var stringvalue = value.ToString();
+                        FormParameters.Add(key, stringvalue);
+                        builder.Append("=");
+                        builder.Append(OAuthEncoding.Encode(stringvalue));
+                    }
+                }
+            }
+            Data = builder.ToString();
+
+            return SetContentTypeTo(@"application/x-www-form-urlencoded; charset: UTF-8");
+            
+        }
+
         public OAuthRequest Sign(string tokenSecret = "")
         {
             String SigBaseStringParams = "";
@@ -150,7 +180,7 @@ namespace Chq.OAuth
             foreach (var item in orderedParameters)
             {
                 if (SigBaseStringParams != "") SigBaseStringParams += "&";
-                SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
+                SigBaseStringParams += item.Key + "=" + item.Value;
             }
 
             String SigBaseString = Method.ToUpper() + "&";
@@ -170,36 +200,30 @@ namespace Chq.OAuth
 
         public async Task<String> ExecuteRequest()
         {
-            HttpWebRequest Request;
+            HttpWebRequest Request;            
+            String SigBaseStringParams = "";
 
-
-            if (Method == "GET")
+            foreach (var item in QueryParameters)
             {
-                String SigBaseStringParams = "";
-                foreach (var item in QueryParameters)
-                {
-                    if (SigBaseStringParams != "") SigBaseStringParams += "&";
-                    SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
-                }
-
-                Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "": "?" + SigBaseStringParams));
-                Request.Method = Method.ToUpper();
+                if (SigBaseStringParams != "") SigBaseStringParams += "&";
+                SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
             }
-            else
+
+            Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "": "?" + SigBaseStringParams));
+            Request.Method = Method.ToUpper();
+
+
+            if (Method != "GET")
             {
-
-
-                Request = (HttpWebRequest)WebRequest.Create(Url);
-                Request.Method = Method.ToUpper();
                 if (!String.IsNullOrEmpty(ContentType)) Request.ContentType = ContentType;
 
                 if (Data != null)
                 {
-                    var stream = await Request.GetRequestStreamAsync();
-                    StreamWriter stOut = new StreamWriter(stream, System.Text.Encoding.UTF8);
-                    stOut.Write(Data);
-                    await stOut.FlushAsync();
-                    stOut.Dispose();
+                    using (var stream = await Request.GetRequestStreamAsync())
+                    {
+                        var bytes = Encoding.UTF8.GetBytes(Data);
+                        stream.Write(bytes, 0, bytes.Length);
+                    }
                 }
             }
 
@@ -216,6 +240,6 @@ namespace Chq.OAuth
             StreamReader ResponseDataStream = new StreamReader(Response.GetResponseStream());
 
             return ResponseDataStream.ReadToEnd();
-        }
+        }       
     }
 }
