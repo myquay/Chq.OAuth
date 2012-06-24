@@ -63,12 +63,18 @@ client.AccessToken = TokenContainer.Parse(accessTokenResponse);
 ```c#
 String getResponse = await client.MakeRequest("GET")
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
-                  .WithParameters(new { param = "value" })
+                  .WithParameters(new { param = "value" }) //it's important to add the prameters after the resource, internal paramerters reset on ForResource calls
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest();
                   
 String postResponse = await client.MakeRequest("POST")
                   .WithData(data)
+                  .ForResource(client.AccessToken.Token, protectedResourceUri)
+                  .Sign(client.AccessToken.Secret)
+                  .ExecuteRequest();
+
+String postResponse = await client.MakeRequest("POST")
+                  .WithFormEncodedData(new {name = "Peter"}) //this will be sent as a key/value in the request body an is included in the OAuth signature
                   .ForResource(client.AccessToken.Token, protectedResourceUri)
                   .Sign(client.AccessToken.Secret)
                   .ExecuteRequest();
