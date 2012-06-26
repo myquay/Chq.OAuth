@@ -11,10 +11,11 @@ using Chq.OAuth.Helpers;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
+using Windows.Foundation;
 
 namespace Chq.OAuth
 {
-    public class OAuthRequest
+    public sealed class OAuthRequest
     {
         Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
         Dictionary<string, string> AuthParameters = new Dictionary<string, string>();
@@ -37,7 +38,7 @@ namespace Chq.OAuth
         string Data {get;set;}
         string ContentType {get;set;}
 
-        protected OAuthContext _context;
+        private OAuthContext _context;
         public OAuthContext Context
         {
             get { return _context; }
@@ -173,7 +174,12 @@ namespace Chq.OAuth
             
         }
 
-        public OAuthRequest Sign(string tokenSecret = "")
+        public OAuthRequest Sign()
+        {
+            return Sign(string.Empty);
+        }
+
+        public OAuthRequest Sign(string tokenSecret)
         {
             String SigBaseStringParams = "";
             var orderedParameters = AllParameters.OrderBy(d => d.Key);
@@ -197,8 +203,19 @@ namespace Chq.OAuth
 
             return this;
         }
+#if WINMD
+        public IAsyncOperation<string> ExecuteRequest()
+        {
+            return ExecuteRequestInternal().AsAsyncOperation<string>();
+        }
+#else
+        public Task<String> ExecuteRequest()
+        {
+            return ExecuteRequestInternal();
+        }
+#endif
 
-        public async Task<String> ExecuteRequest()
+        private async Task<String> ExecuteRequestInternal()
         {
             HttpWebRequest Request;            
             String SigBaseStringParams = "";

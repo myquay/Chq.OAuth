@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Chq.OAuth.Credentials
 {
-    public class TokenContainer
+    public sealed class TokenContainer
     {
-        public enum Types { Client, Temporary, Token }
         
         public string Token { get; set; }
         public string Secret { get; set; }
-        public Types Type { get; set; }
 
         public static TokenContainer Parse(string tokenString)
         {

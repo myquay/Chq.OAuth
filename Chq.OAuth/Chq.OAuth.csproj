@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C67880F4-EE9E-4E67-8BA2-D1C397F407D4}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Chq.OAuth</RootNamespace>
     <AssemblyName>Chq.OAuth</AssemblyName>
@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE, WINMD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -105,19 +105,23 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ClientState.cs" />
     <Compile Include="Credentials\TokenVerifier.cs" />
     <Compile Include="Extensions\DateTime.cs" />
     <Compile Include="Helpers\OAuthEncoding.cs" />
     <Compile Include="Helpers\OAuthParameters.cs" />
     <Compile Include="OAuthContext.cs" />
-    <Compile Include="OAuthException.cs" />
     <Compile Include="Credentials\TokenContainer.cs" />
     <Compile Include="OAuthRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="SignatureMethods.cs" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
