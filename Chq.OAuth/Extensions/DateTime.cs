@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System
 {
-    public static class DateTimeExtensions
+    static class DateTimeExtensions
     {
         public static long SinceEpoch(this DateTime time)
         {

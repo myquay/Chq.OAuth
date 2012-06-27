@@ -7,9 +7,8 @@ using Chq.OAuth.Credentials;
 
 namespace Chq.OAuth
 {
-    public class OAuthContext
+    public sealed class OAuthContext
     {
-        public enum SignatureMethods { HMAC_SHA1 }
 
         public Uri RequestUri { get; set; }
         public Uri AuthorizationUri { get; set; }
@@ -47,21 +46,26 @@ namespace Chq.OAuth
 
         public OAuthContext() { }
 
+        public OAuthContext(string consumerKey, string consumerSecret,
+            string requestUri, string authorizationUri,
+            string accessUri) :
+            this(consumerKey, consumerSecret, requestUri, authorizationUri, 
+            accessUri, null, false, SignatureMethods.HMAC_SHA1) {} 
+
         public OAuthContext(
             string consumerKey,
             string consumerSecret,
             string requestUri,
             string authorizationUri,
             string accessUri,
-            string callbackUri = null,
-            bool isOutOfBand = false,
-            SignatureMethods signatureMethod = SignatureMethods.HMAC_SHA1)
+            string callbackUri,
+            bool isOutOfBand,
+            SignatureMethods signatureMethod)
         {
             ConsumerToken = new TokenContainer
             {
                 Token = consumerKey,
                 Secret = consumerSecret,
-                Type = TokenContainer.Types.Client
             };
 
             RequestUri = new Uri(requestUri);
