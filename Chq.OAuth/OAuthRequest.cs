@@ -4,14 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+#if !WINMD
+using System.Security.Cryptography;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 using Chq.OAuth.Credentials;
 using Chq.OAuth.Helpers;
+#if WINMD
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
 using Windows.Foundation;
+#endif
 
 namespace Chq.OAuth
 {
@@ -100,6 +105,7 @@ namespace Chq.OAuth
         {
             if (parameters != null)
             {
+#if WINMD
                 foreach (var parameter in parameters.GetType().GetTypeInfo().DeclaredProperties)
                 {
                     if (parameter.Name.StartsWith("oauth_"))
@@ -113,6 +119,21 @@ namespace Chq.OAuth
                         QueryParameters.Add(parameter.Name, parameter.GetValue(parameters).ToString());
                     }
                 }
+#else
+                foreach (var parameter in parameters.GetType().GetProperties())
+                {
+                    if (parameter.Name.StartsWith("oauth_"))
+                    {
+                        AuthParameters.Remove(parameter.Name);
+                        AuthParameters.Add(parameter.Name, parameter.GetValue(parameters, null).ToString());
+                    }
+                    else
+                    {
+                        if (QueryParameters.ContainsKey(parameter.Name)) QueryParameters.Remove(parameter.Name);
+                        QueryParameters.Add(parameter.Name, parameter.GetValue(parameters, null).ToString());
+                    }
+                }
+#endif
             }
             return this;
         }
@@ -151,6 +172,7 @@ namespace Chq.OAuth
             StringBuilder builder = new StringBuilder();
             if (data != null)
             {
+#if WINMD
                 foreach (var item in data.GetType().GetTypeInfo().DeclaredProperties)
                 {
                     if (builder.Length > 0)
@@ -167,6 +189,24 @@ namespace Chq.OAuth
                         builder.Append(OAuthEncoding.Encode(stringvalue));
                     }
                 }
+#else
+                foreach (var item in data.GetType().GetProperties())
+                {
+                    if (builder.Length > 0)
+                        builder.Append("&");
+                    var key = item.Name;
+                    builder.Append(key);
+                    object value = item.GetValue(data, null);
+
+                    if (value != null)
+                    {
+                        var stringvalue = value.ToString();
+                        FormParameters.Add(key, stringvalue);
+                        builder.Append("=");
+                        builder.Append(OAuthEncoding.Encode(stringvalue));
+                    }
+                }
+#endif
             }
             Data = builder.ToString();
 
@@ -181,6 +221,7 @@ namespace Chq.OAuth
 
         public OAuthRequest Sign(string tokenSecret)
         {
+
             String SigBaseStringParams = "";
             var orderedParameters = AllParameters.OrderBy(d => d.Key);
             foreach (var item in orderedParameters)
@@ -192,32 +233,35 @@ namespace Chq.OAuth
             String SigBaseString = Method.ToUpper() + "&";
             SigBaseString += OAuthEncoding.Encode(Url.ToString()) + "&" + OAuthEncoding.Encode(SigBaseStringParams);
 
+            String Signature;
+#if WINMD
             IBuffer KeyMaterial = CryptographicBuffer.ConvertStringToBinary(Context.ConsumerToken.Secret + "&" + tokenSecret, BinaryStringEncoding.Utf8);
             MacAlgorithmProvider HmacSha1Provider = MacAlgorithmProvider.OpenAlgorithm("HMAC_SHA1");
             CryptographicKey MacKey = HmacSha1Provider.CreateKey(KeyMaterial);
             IBuffer DataToBeSigned = CryptographicBuffer.ConvertStringToBinary(SigBaseString, BinaryStringEncoding.Utf8);
             IBuffer SignatureBuffer = CryptographicEngine.Sign(MacKey, DataToBeSigned);
-            String Signature = CryptographicBuffer.EncodeToBase64String(SignatureBuffer);
-
+            Signature = CryptographicBuffer.EncodeToBase64String(SignatureBuffer);
+#else
+            HMACSHA1 myhmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(Context.ConsumerToken.Secret + "&" + tokenSecret));
+            byte[] byteArray = Encoding.UTF8.GetBytes(SigBaseString);
+            MemoryStream stream = new MemoryStream(byteArray);
+            byte[] hashValue = myhmacsha1.ComputeHash(stream);
+            Signature = System.Convert.ToBase64String(hashValue);
+#endif
             AuthParameters.Add(OAuthParameters.SIGNATURE, Signature);
 
             return this;
+
         }
 #if WINMD
         public IAsyncOperation<string> ExecuteRequest()
         {
-            return ExecuteRequestInternal().AsAsyncOperation<string>();
+            return ExecuteRequestInternal().AsAsyncOperation();
         }
-#else
-        public Task<String> ExecuteRequest()
-        {
-            return ExecuteRequestInternal();
-        }
-#endif
 
-        private async Task<String> ExecuteRequestInternal()
+        private async Task<string> ExecuteRequestInternal()
         {
-            HttpWebRequest Request;            
+            HttpWebRequest Request;
             String SigBaseStringParams = "";
 
             foreach (var item in QueryParameters)
@@ -226,7 +270,7 @@ namespace Chq.OAuth
                 SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
             }
 
-            Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "": "?" + SigBaseStringParams));
+            Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "" : "?" + SigBaseStringParams));
             Request.Method = Method.ToUpper();
 
 
@@ -248,7 +292,7 @@ namespace Chq.OAuth
             var orderedParameters = AuthParameters.OrderBy(d => d.Key);
             foreach (var item in orderedParameters)
             {
-                authHeader += (item.Key != orderedParameters.First().Key ? ", ":" ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value)+"\"";
+                authHeader += (item.Key != orderedParameters.First().Key ? ", " : " ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value) + "\"";
             }
 
             Request.Headers["Authorization"] = authHeader;
@@ -257,6 +301,55 @@ namespace Chq.OAuth
             StreamReader ResponseDataStream = new StreamReader(Response.GetResponseStream());
 
             return ResponseDataStream.ReadToEnd();
-        }       
+        }
+#else
+        public Task<String> ExecuteRequest()
+        {
+            return new Task<string>(() =>
+                {
+                    HttpWebRequest Request;
+                    String SigBaseStringParams = "";
+
+                    foreach (var item in QueryParameters)
+                    {
+                        if (SigBaseStringParams != "") SigBaseStringParams += "&";
+                        SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
+                    }
+
+                    Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "" : "?" + SigBaseStringParams));
+                    Request.Method = Method.ToUpper();
+
+
+                    if (Method != "GET")
+                    {
+                        if (!String.IsNullOrEmpty(ContentType)) Request.ContentType = ContentType;
+
+                        if (Data != null)
+                        {
+                            using (var stream = Request.GetRequestStream())
+                            {
+                                var bytes = Encoding.UTF8.GetBytes(Data);
+                                stream.Write(bytes, 0, bytes.Length);
+                            }
+                        }
+                    }
+
+                    String authHeader = "OAuth";
+                    var orderedParameters = AuthParameters.OrderBy(d => d.Key);
+                    foreach (var item in orderedParameters)
+                    {
+                        authHeader += (item.Key != orderedParameters.First().Key ? ", " : " ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value) + "\"";
+                    }
+
+                    Request.Headers["Authorization"] = authHeader;
+
+                    HttpWebResponse Response = (HttpWebResponse)Request.GetResponse();
+                    StreamReader ResponseDataStream = new StreamReader(Response.GetResponseStream());
+
+                    return ResponseDataStream.ReadToEnd();
+                });
+        }
+#endif
+
     }
 }
