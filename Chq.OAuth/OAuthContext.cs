@@ -37,7 +37,6 @@ namespace Chq.OAuth
                 {
                     case SignatureMethods.HMAC_SHA1:
                         return "HMAC-SHA1";
-                        break;
                     default:
                         return "";
                 }
@@ -50,7 +49,14 @@ namespace Chq.OAuth
             string requestUri, string authorizationUri,
             string accessUri) :
             this(consumerKey, consumerSecret, requestUri, authorizationUri, 
-            accessUri, null, false, SignatureMethods.HMAC_SHA1) {} 
+            accessUri, null, false, SignatureMethods.HMAC_SHA1) {}
+
+        public OAuthContext(string consumerKey, string consumerSecret,
+            string requestUri, string authorizationUri,
+            string accessUri,
+            string callbackUri) :
+            this(consumerKey, consumerSecret, requestUri, authorizationUri,
+            accessUri, callbackUri, false, SignatureMethods.HMAC_SHA1) { } 
 
         public OAuthContext(
             string consumerKey,

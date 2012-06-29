@@ -5,6 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chq.OAuth.WinRT", "Chq.OAut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chq.OAuth.Net", "Chq.OAuth.Net.csproj", "{CF5C8F20-5655-4F11-BDBC-5675D7476FC8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21866625-27E7-44C4-B5C0-A5A02EBEC6F5}"
+	ProjectSection(SolutionItems) = preProject
+		Chq.OAuth.nuspec = Chq.OAuth.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM

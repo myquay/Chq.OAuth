@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Chq.OAuth.dll</id>
-    <version>0.7.2</version>
-    <title>Chq.OAuth</title>
+    <version>0.8.1</version>
     <authors>Michael McKenna</authors>
     <owners>Michael McKenna</owners>
     <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
     <projectUrl>http://oauth.concepthq.net</projectUrl>
+    <id>Chq.OAuth.dll</id>
+    <title>Chq.OAuth</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>OAuth library for Windows 8</description>
-    <releaseNotes>Recompiled under Windows 8 RP. Coolya fixed a bug for when the callback URL is null.</releaseNotes>
+    <description>A WinMD OAuth library for Windows 8.</description>
+    <summary />
+    <releaseNotes>Coolya made the lib WinMD compatible so now it can be now used in all WinRT applications, not just the C# ones ;)</releaseNotes>
     <copyright>Copyright 2012</copyright>
-    <tags>WinRT OAuth Windows 8</tags>
+    <language>es-US</language>
+    <tags>WinRT OAuth Windows 8 WinMD</tags>
   </metadata>
+  <files />
 </package>

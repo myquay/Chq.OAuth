@@ -227,7 +227,7 @@ namespace Chq.OAuth
             foreach (var item in orderedParameters)
             {
                 if (SigBaseStringParams != "") SigBaseStringParams += "&";
-                SigBaseStringParams += item.Key + "=" + item.Value;
+                SigBaseStringParams += item.Key + "=" +  OAuthEncoding.Encode(item.Value);
             }
 
             String SigBaseString = Method.ToUpper() + "&";
@@ -267,7 +267,7 @@ namespace Chq.OAuth
             foreach (var item in QueryParameters)
             {
                 if (SigBaseStringParams != "") SigBaseStringParams += "&";
-                SigBaseStringParams += item.Key + "=" + OAuthEncoding.Encode(item.Value);
+                SigBaseStringParams += OAuthEncoding.Encode(item.Key) + "=" + OAuthEncoding.Encode(item.Value);
             }
 
             Request = (HttpWebRequest)WebRequest.Create(Url + (String.IsNullOrEmpty(SigBaseStringParams) ? "" : "?" + SigBaseStringParams));
