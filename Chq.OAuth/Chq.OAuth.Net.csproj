@@ -7,8 +7,8 @@
     <ProjectGuid>{CF5C8F20-5655-4F11-BDBC-5675D7476FC8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClassLibrary1</RootNamespace>
-    <AssemblyName>ClassLibrary1</AssemblyName>
+    <RootNamespace>Chq.OAuth</RootNamespace>
+    <AssemblyName>Chq.OAuth</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

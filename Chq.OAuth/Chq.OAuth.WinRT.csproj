@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\WinRT\Release\</OutputPath>
-    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
+    <DefineConstants>TRACE;NETFX_CORE;WINMD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -104,25 +104,24 @@
     <CodeAnalysisRuleSet>ExpressRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="ClientState.cs" />
-    <Compile Include="Credentials\TokenVerifier.cs" />
-    <Compile Include="Extensions\DateTime.cs" />
-    <Compile Include="Helpers\OAuthEncoding.cs" />
-    <Compile Include="Helpers\OAuthParameters.cs" />
-    <Compile Include="OAuthContext.cs" />
-    <Compile Include="Credentials\TokenContainer.cs" />
-    <Compile Include="OAuthRequest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="SignatureMethods.cs" />
-  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Client.cs" />
+    <Compile Include="ClientState.cs" />
+    <Compile Include="Credentials\TokenContainer.cs" />
+    <Compile Include="Credentials\TokenVerifier.cs" />
+    <Compile Include="Extensions\DateTime.cs" />
+    <Compile Include="Helpers\OAuthEncoding.cs" />
+    <Compile Include="Helpers\OAuthParameters.cs" />
+    <Compile Include="OAuthContext.cs" />
+    <Compile Include="OAuthRequest.cs" />
+    <Compile Include="SignatureMethods.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
