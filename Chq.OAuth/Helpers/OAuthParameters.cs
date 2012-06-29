@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chq.OAuth.Helpers
 {
-    public static class OAuthParameters
+    static class OAuthParameters
     {
         public static string CALL_BACK = "oauth_callback";
         public static string CONSUMER_KEY = "oauth_consumer_key";

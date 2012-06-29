@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chq.OAuth.Credentials
 {
-    public class TokenVerifier
+    public sealed class TokenVerifier
     {
         public string Verifier { get; set; }
 

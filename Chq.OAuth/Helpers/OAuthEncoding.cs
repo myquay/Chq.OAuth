@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chq.OAuth.Helpers
 {
-    public class OAuthEncoding
+    public sealed class OAuthEncoding
     {
 
         //http://tools.ietf.org/html/rfc5849#section-3.6

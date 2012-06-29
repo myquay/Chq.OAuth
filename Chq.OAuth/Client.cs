@@ -7,11 +7,9 @@ using Chq.OAuth.Credentials;
 
 namespace Chq.OAuth
 {
-    public class Client
+    public sealed class Client
     {
-        public enum OAuthState { RequestRequired, TokenRequired, Ready }
-
-        protected OAuthContext _context;
+        private OAuthContext _context;
         public OAuthContext Context
         {
             get { return _context; }
