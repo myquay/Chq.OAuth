@@ -94,10 +94,10 @@ namespace Chq.OAuth
         }
 
         [Obsolete("Please use WithParameters(...)")]
-        public OAuthRequest WithQueryParameter(string name, string value)
+        public OAuthRequest WithQueryParameter(string name, string val)
         {
             if (QueryParameters.ContainsKey(name)) QueryParameters.Remove(name);
-            QueryParameters.Add(name, value);
+            QueryParameters.Add(name, val);
             return this;
         }
 
