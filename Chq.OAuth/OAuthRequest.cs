@@ -223,7 +223,7 @@ namespace Chq.OAuth
         {
 
             String SigBaseStringParams = "";
-            var orderedParameters = AllParameters.OrderBy(d => d.Key);
+            var orderedParameters = AllParameters.OrderBy(d => d, new QueryParameterComparer());
             foreach (var item in orderedParameters)
             {
                 if (SigBaseStringParams != "") SigBaseStringParams += "&";
@@ -289,7 +289,7 @@ namespace Chq.OAuth
             }
 
             String authHeader = "OAuth";
-            var orderedParameters = AuthParameters.OrderBy(d => d.Key);
+            var orderedParameters = AuthParameters.OrderBy(d => d, new QueryParameterComparer());
             foreach (var item in orderedParameters)
             {
                 authHeader += (item.Key != orderedParameters.First().Key ? ", " : " ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value) + "\"";
@@ -335,7 +335,7 @@ namespace Chq.OAuth
                     }
 
                     String authHeader = "OAuth";
-                    var orderedParameters = AuthParameters.OrderBy(d => d.Key);
+                    var orderedParameters = AuthParameters.OrderBy(d => d, new QueryParameterComparer());
                     foreach (var item in orderedParameters)
                     {
                         authHeader += (item.Key != orderedParameters.First().Key ? ", " : " ") + item.Key + "=\"" + OAuthEncoding.Encode(item.Value) + "\"";
@@ -350,6 +350,16 @@ namespace Chq.OAuth
                 });
         }
 #endif
-
+        class QueryParameterComparer : IComparer<KeyValuePair<string, string>>
+        {
+            public int Compare(KeyValuePair<string, string> x, KeyValuePair<string, string> y)
+            {
+                if (x.Key == y.Key)
+                {
+                    return string.Compare(x.Value, y.Value, StringComparison.Ordinal);
+                }
+                return string.Compare(x.Key, y.Key, StringComparison.Ordinal);
+            }
+        }
     }
 }
