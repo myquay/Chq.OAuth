@@ -1,4 +1,3 @@
-
 Chq.OAuth
 =========
 
@@ -82,3 +81,5 @@ String postResponse = await client.MakeRequest("POST")
 ```
 
 7: Fork it, have fun, create a wrapper for your favourite web applications
+
+Chq.OAuth is Copyright © 2013 Michael McKenna and other contributors under the MIT license.
