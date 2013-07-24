@@ -82,4 +82,4 @@ String postResponse = await client.MakeRequest("POST")
 
 7: Fork it, have fun, create a wrapper for your favourite web applications
 
-Chq.OAuth is Copyright © 2013 Michael McKenna and other contributors under the MIT license.
+Chq.OAuth is Copyright © 2013 [Michael McKenna](http://www.michael-mckenna.com/) and other contributors under the [MIT license](https://github.com/myquay/Chq.OAuth/blob/master/LICENSE).
